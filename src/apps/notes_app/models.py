@@ -1,20 +1,6 @@
 from django.db import models
 import uuid
-
-
-# Заметка должна содержать:
-#     • заголовок
-#     • содержимое (текст с поддержкой базового HTML-форматирования
-#     • дату/время создания
-#     • категорию:
-#         ◦ Ссылка
-#         ◦ Заметка
-#         ◦ Памятка
-#         ◦ TODO
-#         ◦ …
-#     • отметку “избранная”
-#     • опциональный id для доступа по прямой ссылке (uuid)
-
+from apps.users.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -27,6 +13,9 @@ class Note(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     is_liked = models.BooleanField(default=False)
+    author = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True
+        )
 
     def __str__(self) -> str:
         return self.name
