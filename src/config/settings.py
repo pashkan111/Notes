@@ -28,6 +28,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
     'apps.notes_app',
     'apps.users',
+    'apps.django_common',
 ]
 
 EXTRA_APPS = [
@@ -109,7 +110,6 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'apply_auth_per_user': '400/min',
     },
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
 
