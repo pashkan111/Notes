@@ -1,7 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 from django.core.exceptions import MultipleObjectsReturned
 from django.db.models import Q, QuerySet
-
+from apps.django_common.exceptions import ExistsUserError
 
 class UserQueryset(QuerySet):
     def active(self):
@@ -22,6 +22,8 @@ class UserManager(BaseUserManager.from_queryset(UserQueryset)):
         is_active: bool = False,
         is_superuser: bool = False,
     ):
+        self.__check_user(mobile_phone)
+        
         user = self.model(
             mobile_phone=mobile_phone,
             is_staff=is_staff,
@@ -32,6 +34,13 @@ class UserManager(BaseUserManager.from_queryset(UserQueryset)):
 
         user.save()
         return user
+
+    def __check_user(self, mobile_phone: str) -> None:
+        user_exists = self.model.objects.filter(
+            mobile_phone=mobile_phone
+            ).exists()
+        if user_exists is True:
+            raise ExistsUserError()
 
     def create_user(
         self, 
