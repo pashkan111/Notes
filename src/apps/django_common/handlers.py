@@ -20,7 +20,6 @@ class AbstractHandler(ABC):
         self.raw_data = raw_data
 
     def error_detail(self) -> dict:
-        print('----------')
         if isinstance(self.raw_data, (tuple, list)):
             for raw_data in self.raw_data:
                 self.raw_data = {'detail': raw_data}

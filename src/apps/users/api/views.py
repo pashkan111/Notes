@@ -1,30 +1,32 @@
-from apps.users.models import User
-from apps.users.api.serializers import AuthSerializer, UserSerializer
-from rest_framework import generics, request, response
-from rest_framework.authentication import authenticate
+from rest_framework_simplejwt.views import TokenObtainPairView as BaseTokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView as BaseTokenRefreshView
+from rest_framework import generics, request, response, status
 from apps.django_common import views
 
-class LoginView(views.PublicJSONResponseView, generics.GenericAPIView):
-    serializer_class = AuthSerializer
+from . import serializers
+from apps.users.models import User
 
-    def post(self, request: request.Request) -> response.Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        user = authenticate(**serializer.data)
-        if user is None:
-            return response.Response(status=401)
-        return response.Response(status=200)
+class TokenObtainPairView(views.PublicJSONResponseView, BaseTokenObtainPairView):
+    serializer_class = serializers.TokenObtainPairSerializer
+
+
+class TokenRefreshView(views.PublicJSONResponseView, BaseTokenRefreshView):
+    ...
 
 
 class RegisterView(views.PublicJSONResponseView, generics.GenericAPIView):
-    serializer_class = AuthSerializer
+    serializer_class = serializers.AuthSerializer
 
     def post(self, request: request.Request) -> response.Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = User.objects.create_user(**serializer.data)
+        jwt_token = serializers.TokenObtainPairSerializer.get_token(user)
         return response.Response(
-            UserSerializer(instance=user).data, status=200
+            data={
+                'access': str(jwt_token.access_token),
+                'refresh': str(jwt_token),
+            }, status=status.HTTP_201_CREATED
         )

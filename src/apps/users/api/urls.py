@@ -1,8 +1,8 @@
 from django.urls import path
-from . import views
 
+from .views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    path('login', views.LoginView.as_view()),
-    path('register', views.RegisterView.as_view())
+    path("", TokenObtainPairView.as_view(), name="token_obtain"),
+    path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
