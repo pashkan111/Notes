@@ -1,6 +1,6 @@
 from . import serializers
 from rest_framework import generics, viewsets
-from apps.django_common.mixins import views
+from apps.django_common import views
 from apps.notes_app import models
 from .filters import NoteFilter
 
@@ -10,7 +10,7 @@ class CategoryListView(views.PublicJSONResponseView, generics.ListAPIView):
     queryset = models.Category.objects.all()
 
 
-class NoteView(viewsets.ModelViewSet):
+class NoteView(views.JSONResponseView, viewsets.ModelViewSet):
     serializer_class = serializers.NoteSerializer
     lookup_field = 'guid'
     filterset_class = NoteFilter

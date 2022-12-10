@@ -15,32 +15,34 @@
     <div class="col-lg-3">
         <input placeholder="Телефон" class="form-control" id="mobile_phone"/>
         <input placeholder="Пароль" type="password" class="form-control" id="password"/>
-        <input class="btn btn-primary" type="submit" id='send-data' value="Зарегистрироваться"/>
+        <p id="error-text"></p>
+        <input class="btn btn-primary mt-3" type="submit" id='send-data' value="Зарегистрироваться"/>
     </div>
-    <div>
+    <!-- <div>
         <p><a href="#">Уже зарегистрированы?</a></p>
-    </div>
+    </div> -->
 </div>
     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
     <!-- <script src="{% static 'js/utils.js'%}"></script> -->
     <script>
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-  }
-    return cookieValue;
-}
+const redStyle = "border-color:#f71616; box-shadow: 0 0 7px #d45252;"
+// function getCookie(name) {
+//     var cookieValue = null;
+//     if (document.cookie && document.cookie != '') {
+//         var cookies = document.cookie.split(';');
+//         for (var i = 0; i < cookies.length; i++) {
+//             var cookie = jQuery.trim(cookies[i]);
+//             if (cookie.substring(0, name.length + 1) == (name + '=')) {
+//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                 break;
+//             }
+//         }
+//   }
+//     return cookieValue;
+// }
 
-const csrf_token = getCookie('csrftoken')
+// const csrf_token = getCookie('csrftoken')
 
 async function postData(url, data) {
     const response = await fetch(url, {
@@ -49,7 +51,7 @@ async function postData(url, data) {
         credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
-          "X-CSRFTOKEN":  csrf_token
+        //   "X-CSRFTOKEN":  csrf_token
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer', 
@@ -60,45 +62,58 @@ async function postData(url, data) {
 
 const register_url = 'http://127.0.0.1:8000/api/users/register'
 
+const mobile_phone = document.getElementById('mobile_phone')
+const password = document.getElementById('password')
+const error_text = document.getElementById('error-text')
+
 document.getElementById('send-data').onclick = () => {
     sendCredentials()
-    const mobile_phone = document.getElementById('mobile_phone')
-    const password = document.getElementById('password')
+}
 
-    mobile_phone.value = ''
-    password.value = ''
+function setStyle(elems, style){
+    elems.forEach((el) => {
+        el.style.cssText = style
+    })
+}
+
+function setStyleForEmpty(elems){
+    elems.forEach((el) => {
+        if (!el.value){
+            setStyle([el], redStyle)
+        }
+    })
+}
+
+function setErrorText(text){
+    setStyle([error_text], "color:#f71616")
+    error_text.innerHTML = text
 }
 
 
-function errorElement(elems){
-    elems
-    el.style.borderColor = "border-color:#f71616; box-shadow: 0 0 7px #d45252;"
-}
 
 
 async function sendCredentials(){
 
-    const mobile_phone = document.getElementById('mobile_phone').value
-    const password = document.getElementById('password').value
-
-    if (!mobile_phone || !password) {
-        console.log('INPUT PASSWORD')
+    if (!mobile_phone.value || !password.value) {
+        setStyleForEmpty([mobile_phone, password])
+        setErrorText('Заполните обязательные поля')
         return
     }
         const data = {
-            mobile_phone: mobile_phone,
-            password: password
+            mobile_phone: mobile_phone.value,
+            password: password.value
         }
 
         postData(register_url, data)
         .then((data) => {
-            if (data.ok) {
-                data.json().then((data) => console.log(data))
-            } else {
-                data.json().then((data) => console.log(data))
-                errorElement()
-            }
+            data.json().then((data) => {
+                if (data.error){
+                    setErrorText(data.error.description)
+                } else {
+                }
+            })
         })
+
 
     } 
 

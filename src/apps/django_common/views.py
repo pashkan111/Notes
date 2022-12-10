@@ -1,5 +1,5 @@
 from rest_framework.permissions import AllowAny
-
+from .renderers import JSONRenderer
 
 
 class PublicAPIView:
@@ -7,7 +7,7 @@ class PublicAPIView:
 
 
 class JSONResponseView:
-    pass
+    renderer_classes = [JSONRenderer]
 
 
 class PublicJSONResponseView(PublicAPIView, JSONResponseView):
