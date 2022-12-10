@@ -1,0 +1,108 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h3>Регистрация</h3>
+    <div class="col-lg-3">
+        <input placeholder="Телефон" class="form-control" id="mobile_phone"/>
+        <input placeholder="Пароль" type="password" class="form-control" id="password"/>
+        <input class="btn btn-primary" type="submit" id='send-data' value="Зарегистрироваться"/>
+    </div>
+    <div>
+        <p><a href="#">Уже зарегистрированы?</a></p>
+    </div>
+</div>
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <!-- <script src="{% static 'js/utils.js'%}"></script> -->
+    <script>
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+  }
+    return cookieValue;
+}
+
+const csrf_token = getCookie('csrftoken')
+
+async function postData(url, data) {
+    const response = await fetch(url, {
+        method: 'POST',
+        cache: 'no-cache', 
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          "X-CSRFTOKEN":  csrf_token
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer', 
+        body: JSON.stringify(data) 
+    });
+      return await response; 
+  }
+
+const register_url = 'http://127.0.0.1:8000/api/users/register'
+
+document.getElementById('send-data').onclick = () => {
+    sendCredentials()
+    const mobile_phone = document.getElementById('mobile_phone')
+    const password = document.getElementById('password')
+
+    mobile_phone.value = ''
+    password.value = ''
+}
+
+
+function errorElement(elems){
+    elems
+    el.style.borderColor = "border-color:#f71616; box-shadow: 0 0 7px #d45252;"
+}
+
+
+async function sendCredentials(){
+
+    const mobile_phone = document.getElementById('mobile_phone').value
+    const password = document.getElementById('password').value
+
+    if (!mobile_phone || !password) {
+        console.log('INPUT PASSWORD')
+        return
+    }
+        const data = {
+            mobile_phone: mobile_phone,
+            password: password
+        }
+
+        postData(register_url, data)
+        .then((data) => {
+            if (data.ok) {
+                data.json().then((data) => console.log(data))
+            } else {
+                data.json().then((data) => console.log(data))
+                errorElement()
+            }
+        })
+
+    } 
+
+
+    </script>
+</body>
+</html>
