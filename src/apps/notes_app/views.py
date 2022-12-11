@@ -7,3 +7,7 @@ def main(request):
 
 def create_edit(request):
     return render(request, 'notes/create_edit.html')
+
+
+def edit(request):
+    return render(request, 'notes/edit.html')

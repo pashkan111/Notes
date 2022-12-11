@@ -23,3 +23,6 @@ class NoteView(views.JSONResponseView, viewsets.ModelViewSet):
     def perform_create(self, serializer: serializers.NoteSerializer):
         serializer.save(author=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, partial=True, **kwargs)
+

@@ -69,6 +69,32 @@ function makeBody(){
     }
 }
 
+function setFetchedData(note){
+    name.value = note.name
+    text.value = note.text
+    category.value = note.category
+}
+
+function getURL(guid){
+    return createURL + '/' + guid
+}
+
+
+function putData(){
+    const headers = getHeaders()
+    const guid = window.localStorage.getItem('editingNote')
+    const url = getURL(guid)
+    fetchData(url, 'GET', headers).then((data) => {
+        if (data.ok) {
+            data.json().then((data) => {
+                setFetchedData(data.data)
+            })
+        } else {
+            data.json().then((data) => {
+            })
+        }
+        })
+}
 
 function insertOptions(categories, select){
     for (i = 0; i<categories.length; i++){
@@ -96,21 +122,24 @@ function insertCategories(){
 function saveNote(){
     const headers = getHeaders()
     const data = makeBody()
+    const guid = window.localStorage.getItem('editingNote')
+    const url = getURL(guid)
 
-    fetchData(createURL, 'POST', headers, data).then((data) => {
+    fetchData(url, 'PUT', headers, data).then((data) => {
         if (data.ok) {
             data.json().then((data) => {
                 window.location.replace("{% url 'main' %}");
             })
         } else {
             data.json().then((data) => {
+                console.log('no')
             })
         }
         })
 }
 
 insertCategories()
-
+putData()
 </script>
 
 {% endblock %}

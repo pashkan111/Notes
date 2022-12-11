@@ -28,7 +28,7 @@ class NoteSerializer(serializers.ModelSerializer):
         return obj.category.name
 
     def create(self, validated_data):
-        category_name = validated_data.pop('category')
+        category_name = validated_data.pop('category', None)
         category = models.Category.objects.filter(
             name=category_name
         ).first()
@@ -41,6 +41,11 @@ class NoteSerializer(serializers.ModelSerializer):
         return note
 
     def update(self, instance, validated_data):
-        category_id = validated_data.pop('category')
-        validated_data.setdefault('category_id', category_id)
+        category_name = validated_data.pop('category', None)
+        category = models.Category.objects.filter(
+            name=category_name
+        ).first()
+        if category is not None:
+            validated_data.setdefault('category_id', category.id)
+            return super().update(instance, validated_data)
         return super().update(instance, validated_data)

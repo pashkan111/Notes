@@ -43,22 +43,24 @@ const HEADERS = {
     'Content-Type': 'application/json',
 }
 const cards = document.getElementById('cards')
-        
 
 function insertNotes(notes){
     html = ''
     notes.forEach((note) => {
+        const checked = note.is_liked ? 'checked' : ''
 
-        html += `<div class="card" id=${note.id}>
+        html += `<div style="cursor: pointer" class="card" id=${note.guid}>
             <div class="card-header">
             ${note.created}
             ${note.category}
             </div>
-            <div class="card-body">
+            <div  class="card-body">
                 <h5 class="card-title">${note.name}</h5>
                 <p class="card-text">${note.text}</p>
-                <a id=${note.guid} onclick='newwin(event)' href="#" class="btn btn-primary">Edit</a>
+                <a id=${note.guid} onclick='editNode(event)' href="#" class="btn btn-primary">Edit</a>
                 <a id=${note.guid} onclick='deleteNote(event)' href="#" class="btn btn-danger">Delete</a>
+                <label for="liked">Liked</label>
+                <input onclick='handleClick(event)' type="checkbox" id="liked" data-guid=${note.guid} ${checked}/>
                 </div>
             </div>
         `
@@ -71,6 +73,13 @@ function getTokenFromLS(){
     const access = window.localStorage.getItem('access')
     return access
 }
+
+function editNode(event){
+    const noteGuid = event.target.id
+    window.localStorage.setItem('editingNote', noteGuid)
+    window.location.replace("{% url 'edit' %}");
+}
+
 
 function getHeaders(){
     const access = getTokenFromLS()
@@ -99,13 +108,45 @@ function deleteNote(event){
         })
 }
 
-async function fetchData(url, method, headers){
-    const response = await fetch(url, {
-        method: method,
-        headers: headers,
-    });
+async function fetchData(url, method, headers, data){
+    let request = {}
+    if (data){
+        request = {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(data)
+        }
+    } else {
+        request = {
+            method: method,
+            headers: headers,
+        }
+    }
+    const response = await fetch(url, request);
       return await response;
   }
+
+
+function handleClick(event){
+    const checked = event.target.checked
+    const guid = event.target.dataset.guid
+    const url = getURL(guid)
+    const headers = getHeaders()
+
+    fetchData(url, 'PUT', headers, {is_liked: checked}).then((data) => {
+        if (data.ok) {
+            data.json().then((data) => {
+                console.log('ok')
+                console.log(data)
+            })
+        } else {
+            data.json().then((data) => {
+                console.log('no')
+                console.log(data)
+            })
+        }
+        })
+}
 
 
 function getNotes(){
