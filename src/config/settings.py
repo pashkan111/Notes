@@ -36,7 +36,8 @@ EXTRA_APPS = [
     'rest_framework',
     'crispy_forms',
     'django_filters',
-    'corsheaders'
+    'corsheaders',
+    'drf_yasg',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + EXTRA_APPS

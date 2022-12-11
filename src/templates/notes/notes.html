@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="mb-4 col-lg-9">
-    <h1>Заметки</h1>
+    <div>
+        <p><h1>Заметки</h1></p>
+        <p><a href="{% url 'create-edit' %}" class="btn btn-primary">Create</a></p>
+    </div>
     <div id="cards"></div>
 </div>
 {% endblock %}
@@ -34,9 +38,9 @@ const csrf_token = getCookie('csrftoken')
 
 
 const notesURL = 'http://localhost:8000/api/notes/notes'
+
 const HEADERS = {
     'Content-Type': 'application/json',
-    "X-CSRFTOKEN":  csrf_token,
 }
 const cards = document.getElementById('cards')
         
@@ -48,6 +52,7 @@ function insertNotes(notes){
         html += `<div class="card" id=${note.id}>
             <div class="card-header">
             ${note.created}
+            ${note.category}
             </div>
             <div class="card-body">
                 <h5 class="card-title">${note.name}</h5>
@@ -72,11 +77,6 @@ function getHeaders(){
     return Object.assign(HEADERS, {"Authorization": 'Bearer '+access})
 }
 
-
-function newwin(event){
-    console.log('uduudud')
-    console.log(event.target.id)
-}
 
 function getURL(guid){
     return notesURL + '/' + guid

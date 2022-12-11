@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="mb-4 col-lg-9">
+    <div>
+        <p><h1>Create note</h1></p>
+    </div>
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" placeholder="Todo">
+
+    <label for="text">Text</label>
+    <textarea class="form-control" id="text" rows="3"></textarea>
+
+    <label for="categories">Category</label>
+    <select class="form-control" id="categories"></select>
+
+    <input onclick="saveNote()" type="submit" class="btn btn-primary mt-3" value="Save"/>
+    
+</div>
+
+<script>
+
+const createURL = 'http://localhost:8000/api/notes/notes'
+const categoriesURL = 'http://localhost:8000/api/notes/categories'
+
+const name = document.getElementById('name')
+const text = document.getElementById('text')
+const category = document.getElementById('categories')
+
+const HEADERS = {
+    'Content-Type': 'application/json',
+}
+
+
+
+function getTokenFromLS(){
+    const access = window.localStorage.getItem('access')
+    return access
+}
+
+function getHeaders(){
+    const access = getTokenFromLS()
+    return Object.assign(HEADERS, {"Authorization": 'Bearer '+access})
+}
+
+async function fetchData(url, method, headers, data){
+    let request = {}
+    if (data){
+        request = {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(data)
+        }
+    } else {
+        request = {
+            method: method,
+            headers: headers,
+        }
+    }
+    const response = await fetch(url, request);
+      return await response;
+  }
+
+function makeBody(){
+    return {
+        name: name.value,
+        text: text.value,
+        category: category.value,
+    }
+}
+
+
+function insertOptions(categories, select){
+    for (i = 0; i<categories.length; i++){
+        const opt = document.createElement('option');
+            opt.value = i;
+            opt.innerHTML = categories[i].name;
+        select.appendChild(opt);
+    }
+}
+
+function insertCategories(){
+    const headers = getHeaders()
+    fetchData(categoriesURL, 'GET', headers).then((data) => {
+        if (data.ok) {
+            data.json().then((data) => {
+                insertOptions(data.data.results, category)
+            })
+        } else {
+            data.json().then((data) => {
+            })
+        }
+        })
+}
+
+function saveNote(){
+    const headers = getHeaders()
+    const data = makeBody()
+
+    fetchData(createURL, 'POST', headers, data).then((data) => {
+        if (data.ok) {
+            data.json().then((data) => {
+                window.location.replace("{% url 'main' %}");
+            })
+        } else {
+            data.json().then((data) => {
+            })
+        }
+        })
+}
+
+insertCategories()
+
+</script>
+
+{% endblock %}
+
