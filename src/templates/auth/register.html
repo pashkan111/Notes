@@ -27,22 +27,6 @@
     <script>
 
 const redStyle = "border-color:#f71616; box-shadow: 0 0 7px #d45252;"
-// function getCookie(name) {
-//     var cookieValue = null;
-//     if (document.cookie && document.cookie != '') {
-//         var cookies = document.cookie.split(';');
-//         for (var i = 0; i < cookies.length; i++) {
-//             var cookie = jQuery.trim(cookies[i]);
-//             if (cookie.substring(0, name.length + 1) == (name + '=')) {
-//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-//                 break;
-//             }
-//         }
-//   }
-//     return cookieValue;
-// }
-
-// const csrf_token = getCookie('csrftoken')
 
 async function postData(url, data) {
     const response = await fetch(url, {
@@ -89,7 +73,18 @@ function setErrorText(text){
     error_text.innerHTML = text
 }
 
+function removeErrorText(){
+    error_text.innerHTML = ''
+}
 
+
+function addToLocalStorage(obj){
+    const refresh = obj.refresh
+    const access = obj.access
+
+    window.localStorage.setItem('access', access)
+    window.localStorage.setItem('refresh', refresh)
+}
 
 
 async function sendCredentials(){
@@ -104,16 +99,19 @@ async function sendCredentials(){
             password: password.value
         }
 
-        postData(register_url, data)
-        .then((data) => {
+    postData(register_url, data).then((data) => {
+        if (data.ok) {
             data.json().then((data) => {
-                if (data.error){
-                    setErrorText(data.error.description)
-                } else {
-                }
+                removeErrorText()
+                setStyle([mobile_phone, password], '#fff')
+                addToLocalStorage(data.data)
             })
+        } else {
+            data.json().then((data) => {
+                setErrorText(data.error.description)
+            })
+        }
         })
-
 
     } 
 
