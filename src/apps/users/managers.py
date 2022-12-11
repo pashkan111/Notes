@@ -52,7 +52,7 @@ class UserManager(BaseUserManager.from_queryset(UserQueryset)):
             mobile_phone,
             password,
             is_staff=kwargs.get("is_staff", False),
-            is_active=kwargs.get("is_active", False),
+            is_active=kwargs.get("is_active", True),
             is_superuser=kwargs.get("is_superuser", False),
         )
 

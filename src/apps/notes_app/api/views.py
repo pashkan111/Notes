@@ -14,10 +14,15 @@ class NoteView(views.JSONResponseView, viewsets.ModelViewSet):
     serializer_class = serializers.NoteSerializer
     lookup_field = 'guid'
     filterset_class = NoteFilter
+
+    def dispatch(self, request, *args, **kwargs):
+        print(request.headers)
+        return super().dispatch(request, *args, **kwargs)
     
     def get_queryset(self):
         notes = models.Note.objects.select_related('category')\
             .filter(author=self.request.user)
+        print(notes)
         return notes
 
     def perform_create(self, serializer: serializers.NoteSerializer):

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-4 col-lg-9">
+    <h1>Заметки</h1>
+    <div id="cards"></div>
+</div>
+{% endblock %}
+
+
+{% block categories %}
+<div>
+    <h3>Categories</h3>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script>
+
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+  }
+    return cookieValue;
+}
+
+const csrf_token = getCookie('csrftoken')
+
+
+const notesURL = 'http://localhost:8000/api/notes/notes'
+const HEADERS = {
+    'Content-Type': 'application/json',
+    "X-CSRFTOKEN":  csrf_token,
+}
+const cards = document.getElementById('cards')
+        
+
+function insertNotes(notes){
+    html = ''
+    notes.forEach((note) => {
+
+        html += `<div class="card" id=${note.id}>
+            <div class="card-header">
+            ${note.created}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">${note.name}</h5>
+                <p class="card-text">${note.text}</p>
+                <a id=${note.guid} onclick='newwin(event)' href="#" class="btn btn-primary">Edit</a>
+                <a id=${note.guid} onclick='deleteNote(event)' href="#" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        `
+        })
+
+        cards.innerHTML = html
+}
+
+function getTokenFromLS(){
+    const access = window.localStorage.getItem('access')
+    return access
+}
+
+function getHeaders(){
+    const access = getTokenFromLS()
+    return Object.assign(HEADERS, {"Authorization": 'Bearer '+access})
+}
+
+
+function newwin(event){
+    console.log('uduudud')
+    console.log(event.target.id)
+}
+
+function getURL(guid){
+    return notesURL + '/' + guid
+}
+
+function deleteNote(event){
+    noteGuid = event.target.id
+    const headers = getHeaders()
+    const url = getURL(noteGuid)
+    
+    fetchData(url, 'DELETE', headers).then((data) => {
+        if (data.ok) {
+            getNotes()
+        } else {
+            data.json().then((data) => {
+                console.log('no')
+                console.log(data)
+            })
+        }
+        })
+}
+
+async function fetchData(url, method, headers){
+    const response = await fetch(url, {
+        method: method,
+        headers: headers,
+    });
+      return await response;
+  }
+
+
+function getNotes(){
+    const headers = getHeaders()
+    
+    fetchData(notesURL, 'GET', headers).then((data) => {
+        if (data.ok) {
+            data.json().then((data) => {
+                console.log('ok')
+                console.log(data)
+                insertNotes(data.data.results)
+            })
+        } else {
+            data.json().then((data) => {
+                console.log('no')
+                console.log(data)
+            })
+        }
+        })
+}
+
+getNotes()
+
+</script>
+{% endblock %}

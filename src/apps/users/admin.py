@@ -10,20 +10,12 @@ class UserAdmin(admin.ModelAdmin):
         (
             _("Personal info"),
             {
-                "fields": ("mobile_phone",)
+                "fields": ("mobile_phone", 'is_active')
             },
         ),
         (_("Important dates"), {"fields": ("last_login", "created_at")}),
     )
-    add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
-                "fields": ("mobile_phone", "password1", "password2", "is_staff"),
-            },
-        ),
-    )
+
     ordering = ('mobile_phone',)
     readonly_fields = ("last_login", "created_at", )
     list_display = ("mobile_phone", )

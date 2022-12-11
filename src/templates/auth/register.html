@@ -1,19 +1,12 @@
+{% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-</head>
-<body>
-<div class="container">
+
+{% block content %}
+<div class="mb-4">
     <h3>Регистрация</h3>
-    <div class="col-lg-3">
-        <input placeholder="Телефон" class="form-control" id="mobile_phone"/>
+    <div class="row col-md-11">
+        <input placeholder="77056743489" class="form-control" id="mobile_phone"/>
         <input placeholder="Пароль" type="password" class="form-control" id="password"/>
         <p id="error-text"></p>
         <input class="btn btn-primary mt-3" type="submit" id='send-data' value="Зарегистрироваться"/>
@@ -22,11 +15,30 @@
         <p><a href="#">Уже зарегистрированы?</a></p>
     </div> -->
 </div>
+    <script src="{% static 'js/utils.js'%}"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
     <!-- <script src="{% static 'js/utils.js'%}"></script> -->
     <script>
 
 const redStyle = "border-color:#f71616; box-shadow: 0 0 7px #d45252;"
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+  }
+    return cookieValue;
+}
+
+const csrf_token = getCookie('csrftoken')
+
 
 async function postData(url, data) {
     const response = await fetch(url, {
@@ -35,7 +47,7 @@ async function postData(url, data) {
         credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
-        //   "X-CSRFTOKEN":  csrf_token
+          "X-CSRFTOKEN":  csrf_token
         },
         redirect: 'follow',
         referrerPolicy: 'no-referrer', 
@@ -94,10 +106,11 @@ async function sendCredentials(){
         setErrorText('Заполните обязательные поля')
         return
     }
-        const data = {
-            mobile_phone: mobile_phone.value,
-            password: password.value
-        }
+
+    const data = {
+        mobile_phone: mobile_phone.value,
+        password: password.value
+    }
 
     postData(register_url, data).then((data) => {
         if (data.ok) {
@@ -105,6 +118,7 @@ async function sendCredentials(){
                 removeErrorText()
                 setStyle([mobile_phone, password], '#fff')
                 addToLocalStorage(data.data)
+                window.location.replace("{% url 'main' %}");
             })
         } else {
             data.json().then((data) => {
@@ -117,5 +131,4 @@ async function sendCredentials(){
 
 
     </script>
-</body>
-</html>
+{% endblock %}

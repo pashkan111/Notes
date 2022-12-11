@@ -1,0 +1,34 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <title>Notes app</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+{% include 'nav.html' %}
+</head>
+
+<body style="background-color: rgb(220, 220, 217);">
+    <div class="container">
+        <div class="row mt-5">
+            <div class="d-flex justify-content-center mt-5">
+                <div class="d-flex  col-md-10 justify-content-center">
+                    {% block content %} {% endblock %}
+                </div>
+                <div class="col-md-2">
+                    {% block categories %} {% endblock %}
+                </div>     
+            </div>
+
+        </div>     
+    </div>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+</body>
+</html>
