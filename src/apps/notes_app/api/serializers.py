@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryNoteSerializer(serializers.CharField):
     def to_internal_value(self, data):
-        cat = models.Category.objects.get(id=data)
+        cat = models.Category.objects.get(name=data)
         return cat
 
 class NoteSerializer(serializers.ModelSerializer):
